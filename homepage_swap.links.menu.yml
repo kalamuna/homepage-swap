@@ -1,0 +1,12 @@
+homepage_swap.admin_settings_form:
+  title: 'Homepage Swap Settings'
+  route_name: homepage_swap.admin_settings_form
+  description: 'Homepage Swap Types'
+  parent: system.admin_config_system
+  weight: 99
+homepage_swap.swap_page:
+  title: 'Homepage Swap'
+  route_name: homepage_swap.swap_page
+  description: 'Swap Homepage'
+  parent: system.admin_content
+  weight: 99

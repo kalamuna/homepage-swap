@@ -1,0 +1,6 @@
+name: Homepage Swap
+type: module
+description: 'Allows for easy switching of the current homepage.'
+core: 8.x
+version: '8.x-1.x-dev'
+configure: homepage_swap.admin_settings_form

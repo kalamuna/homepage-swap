@@ -1,0 +1,11 @@
+homepage_swap.settings:
+  type: config_object
+  label: 'Allowed Swappable Homepage Content Types'
+  mapping:
+    entity_type:
+       allowed_types:
+        type: sequence
+        label: 'Swappable Homepage Content Types'
+        sequence:
+          type: string
+          label: 'Content type'

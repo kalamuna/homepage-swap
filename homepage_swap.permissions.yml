@@ -1,0 +1,8 @@
+administer swap types:
+  title: 'Administer Swap Types'
+  description: 'Allows users to administer the content types used for swapping homepages.'
+  restrict access: TRUE
+swap homepage:
+  title: 'Swap Homepage'
+  description: 'Allows users to to swap the homepage.'
+  restrict access: TRUE
