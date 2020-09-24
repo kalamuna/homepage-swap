@@ -33,19 +33,31 @@ class Swap extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
       $config = $this->config('homepage_swap.settings');
       
-      // Get list of content types to select which can be used for
-      // Swapping of homepage.
+      // // Get list of content types to select which can be used for
+      // // Swapping of homepage.
       $contentTypes = $config->get('entity_type.allowed_types');
       $contentList = [];
 
-      // Setup the content table list
-      $output = array();
+      // Get the current front page's nid
+      $config = \Drupal::config('system.site');
+      $front = str_replace("/node/", "", $config->get('page.front'));
 
       $header = [
         'page_title' => t('Page Title'),
         'content_type' => t('Content Type'),
-        'quick_links' => t('Quick Links')
+        'quick_links' => t('Quick Links'),
+        'activate' => t('Activate')
       ];
+
+      $form['description'] = array(
+        '#markup' => t('<p>This interface allows you to change the home page of the website in the event of a special promotion or emergency situation</p>'),
+      );
+
+      $form['pages'] = array(
+        '#type' => 'table',
+        '#caption' => $this->t('<h2>Available Homepage Options</h2>'),
+        '#header' => $header
+      );
 
       // Run through content types list and display page titles for each node of that type
       foreach($contentTypes as $ct) {
@@ -55,44 +67,34 @@ class Swap extends ConfigFormBase {
         // Store the node title into the nid's index
         foreach($nodes as $node) {
             $contentList[$node->id()] = $node->title->value;
-            $output[$node->id()] = [
-              'page_title' => t('<a href="/node/' . $node->id() . '">' . $node->title->value . "</a>"),
-              'content_type' => $ct,
-              'quick_links' => t(
+           
+            $form['pages'][$node->id()]['page_title'] = array(
+              '#markup' => t('<a href="/node/' . $node->id() . '">' . $node->title->value . "</a>"),
+            );
+
+            $form['pages'][$node->id()]['content_type'] = array(
+              '#markup' => t($ct),
+            );
+
+            $form['pages'][$node->id()]['quick_links'] = array(
+              '#markup' => t(
                 '<a href="/node/' . $node->id() . '">View</a>' . "&nbsp;" .
                 '<a href="/node/' . $node->id() . '/edit">Edit</a>'
               ),
-            ];
+            );
+
+            if($node->id() == $front) {
+              $form['pages'][$node->id()]['activate'] = array(
+                '#markup' => t('<em>Currently active</em>'),
+              );
+            } else {
+              $form['pages'][$node->id()]['activate'] = [
+                '#markup' => $this->t('<a href="/admin/content/swap_homepage/' . $node->id() . '/confirm_swap" class="button button--secondary">Activate</a>'),
+              ];
+            }
         }
       }
-
-      // Get the current front page's nid
-      $config = \Drupal::config('system.site');
-      $front = str_replace("/node/", "", $config->get('page.front'));
-
-      $form['swap_content'] = [
-          '#type' => 'select',
-          '#title' => $this->t('Select Homepage'),
-          '#description' => $this->t('Please select the page you would like as the homepage.'),
-          '#default_value' => $front,
-          '#options' => $contentList,
-      ];
-
-      $form['confirm_swap'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('<b>Confirm Homepage Swap</b>'),
-        '#description'=> $this->t('By checking this box, I understand that I will be swapping the homepage to the selected page above.'),
-        '#required' => TRUE,
-      ];
-
-      $form['table'] = [
-        '#type' => 'table',
-        '#caption' => $this->t('<h2>Available Homepage Options</h2>'),
-        '#header' => $header,
-        '#rows' => $output,
-        '#empty' => t('No content found'),
-      ];
-
+      
       return parent::buildForm($form, $form_state);
   }
 
@@ -100,26 +102,6 @@ class Swap extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Get configuration for front page
-    $config = \Drupal::configFactory()->getEditable('system.site');
     
-    // Unpublish previous front page
-    $prevFrontId = str_replace("/node/", "", $config->get('page.front'));
-    $prevFront = Node::load($prevFrontId);
-    $prevFront->status = 0;
-    $prevFront->save();
-
-    // Publish new front page
-    $newFrontId = $form_state->getValue('swap_content');
-    $newFront = Node::load($newFrontId);
-    $newFront->status = 1;
-    $newFront->save();
-
-    // Set new front page
-    $config->set('page.front', '/node/' . $newFrontId)->save();
-
-    parent::submitForm($form, $form_state);
-  }
-  
+  } 
 }
-

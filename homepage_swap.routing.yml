@@ -17,3 +17,12 @@ homepage_swap.swap_page:
     _permission: 'swap homepage'
   options:
     _admin_route: TRUE
+
+homepage_swap.swap_confirm_page:
+  path: '/admin/content/swap_homepage/{id}/confirm_swap'
+  defaults:
+    _form: '\Drupal\homepage_swap\Form\SwapConfirmForm'
+    _title: 'Swap Homepage Confirmation'
+  requirements:
+    _permission: 'swap homepage'
+    id: ^\d+$
